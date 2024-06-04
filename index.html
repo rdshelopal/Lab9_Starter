@@ -6,6 +6,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lab 9</title>
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+<script>
+  window.TrackJS && TrackJS.install({ 
+    token: "7527ac34ce63454fb6e291a8990b6d24"
+    // for more configuration options, see https://docs.trackjs.com
+  });
+</script> 
 
   <style>
     button {
@@ -47,6 +54,7 @@
       width: 122px;
     }
   </style>
+
 </head>
 
 <body>
@@ -87,7 +95,16 @@
     </section>
   </main>
 
+
   <script>
+    //step4
+    class CalculationError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = 'CalculationError';
+      }
+    }
+
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -95,13 +112,89 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      try {
+        if (!firstNum || !secondNum) throw new Error("Both input fields must have a value.");
+        if (operator === '/' && secondNum == 0) throw new Error("Division by zero is not allowed.");
+        output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      } catch (error) {
+        output.innerHTML = `Error: ${error.message}`;
+      }
     });
-
-    let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
     // You may move this JS to another file if you wish
+    let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
+
+   const sampleData = {
+      firstNum: document.querySelector('#first-num').value,
+      secondNum: document.querySelector('#second-num').value,
+      operator: document.querySelector('#operator').value,
+      result: null
+    };
+
+    errorBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const consoleMethod = btn.getAttribute('data-console');
+        switch (consoleMethod) {
+          case 'log':
+            console.log('Console Log:', sampleData);
+            break;
+          case 'error':
+            console.error('Console Error:', sampleData);
+            break;
+          case 'count':
+            console.count('Console Count');
+            break;
+          case 'warn':
+            console.warn('Console Warn:', sampleData);
+            break;
+          case 'assert':
+            console.assert(false, 'Console Assert: Assertion failed', sampleData);
+            break;
+          case 'clear':
+            console.clear();
+            break;
+          case 'dir':
+            console.dir(sampleData);
+            break;
+          case 'dirxml':
+            console.dirxml(document);
+            break;
+          case 'groupStart':
+            console.group('Console Group');
+            console.log('Inside group', sampleData);
+            console.groupEnd();
+            break;
+          case 'groupEnd':
+            console.groupEnd();
+            break;
+          case 'table':
+            console.table([sampleData]);
+            break;
+          case 'time':
+            console.time('Console Timer');
+            break;
+          case 'timeEnd':
+            console.timeEnd('Console Timer');
+            break;
+          case 'trace':
+            console.trace('Console Trace');
+            break;
+        }
+      });
+    });
+
+    document.getElementById('trigger-error').addEventListener('click', () => {
+      // Trigger a global error button
+      nonExistentFunction();
+    });
+
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.log('Global Error Caught: ', message, source, lineno, colno, error);
+      // Here you can send the error data to a server using fetch or XMLHttpRequest
+    };
+
+    
   </script>
 </body>
 
